@@ -1,0 +1,119 @@
+<LINK REL=STYLESHEET TYPE="text/css" media=all HREF="./stylesheet.css">
+
+
+<html>
+<head>
+
+<title>Computer Vision</title>
+
+</head>
+
+
+
+<h2><font size="14" face="Calibri">Computer Vision</font></h2>
+<p class=text > 
+On this page I describe some of the Vision related algorithms that I have implemented.
+</p>
+<hr>
+<h6><font size="5" face="Calibri">Hough Transform for Circle Detection</font></h6>
+
+<img width=300 height=280 src="houghedCar.png" align=left alt="HoughTransform"/>
+
+<p class=text > 
+To detect circles in the image I coded a Generalized Hough Transform that uses the parametrization of a circle. This essentially means that instead of storing 2 parameters per pixel as in the case of Simple Hough Transform, I store 3: x location, y location and radius. Therefore I have a 3D Accumulator matrix. I first find the canny edges of the image. These gradient values will be used in the voting scheme for circle detection. The hough3D  function that I implemented goes through the every true pixel in the canny edges. It looks at radius r = 1 to r =169 (lower dim of the image) to see how many circles are possible. Now for every radius value it goes in to see what points this circle would intersect on the image. For each of those points it looks at the gradient of the particular intersected point. It sees whether the gradient is aligned in the direction of the circle. In that case it gets a full vote. As the gradient differs from instantaneous circle gradient the vote value decreases. In addition to this voting scheme I also make sure that the vote values are scaled down for larger radii. I therefore divide each vote value by radius to account for that. 
+</p>
+<br>
+<br>
+<br>
+<hr>
+
+<h5><font size="5" face="Calibri">Foreground/Background Segmentation</font></h5>
+<img width=300 height=280 src="butterflybox.jpg" align=left alt="Intensity" />
+<img width=300 height=280 src="fly_intensity.png" align=left alt="Intensity" />
+<img width=300 height=280 src="fly_segmented.png" align=right alt="Segmentation"/>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<hr>
+
+
+<h6><font size="5" face="Calibri">Recovering Missing Depth from Microsoft Kinect</font></h6>
+<a href="vis_project.pdf">Final Paper</a>
+
+<p class=text >
+This project presents a technique to estimate missing depth information obtained from the Microsoft Kinect. Due to the limitations of the depth sensing technology used by the Kinect, a significant loss and noise incurs when capturing depth information. The paper describes the steps needed to go from raw depth, as cap- tured by Kinect, to a point cloud representation of the recovered missing data. Our main contribution in this paper is the use of an iterative diffusion method that ac- counts for both the known depth values and RGBD segmentation results to recover missing depth information. The algorithm proposed is highly parallelizable and is capable of being implemented for real-time processing by utilizing the Graphical Processing Unit. The process is divided into 5 stages described below.
+</p>
+
+<h6><font size="3" face="Calibri">Capturing</font></h6>
+<img  width=300 height=280 src="visprj_1.png"  alt="Poster"/>
+
+<p class = text >
+Capture image with and without calibration. The white lines denote the edges of the depth capture. Note that in the figure on the right that the edges match with the objects, but one looses information for many pixels during the projection
+</p>
+
+<h6><font size="3" face="Calibri">Filtering</font></h6>
+<img  width=300 height=280 src="visprj_2.png"  alt="Poster"/>
+
+<p class=text>
+The captured depth information contains many small missing values. This is due to the inherit inaccuracy resultant from the way the Kinect captures images. The raw captured data contains both noise and missing depth values due to occlusions. To fill in those gaps with use a fast mean filter.
+</p>
+
+<h6><font size="3" face="Calibri">Segmentation</font></h6>
+<img  width=300 height=280 src="visprj_3.png"  alt="Poster"/>
+
+<p class=text>
+Once the values are quantized, we use QuickShift to segment. QuickShift is a mode seek- ing optimization algorithm, similar to MeanShift, it computes the Parzen density function. Unlike MeanShift, which performs a gradient descent to seek the modes of the distribution, QuickShift uses nearest neighbours. Pixels that converge to the same mode are in the same segment.
+</p>
+
+<h6><font size="3" face="Calibri">Recovering Depth </font></h6>
+<img  width=450 height=500 src="visprj_code.png"  alt="Poster"/>
+
+<p class=text>
+The depth recovery is our main contribution in this project. We use an iterative process that prop- agate values from known depth values to unknown depth values in the same segmented cluster. To speed-up the algorithm for large windows, we use a MonteCarlo inspired method of sampling K values. Furthermore, we use a simple Hough voting scheme to estimate the missing depth, with depth values in and out of the segmented cluster voting (with appropriate weight to the vote). So far as we can tell, this algorithm is original.
+</p>
+<img  width=300 height=280 src="visprj_4.png"  alt="Poster"/>
+
+<h6><font size="3" face="Calibri">Visualizing</font></h6>
+<img  width=300 height=280 src="visprj_5.png"  alt="Poster"/>
+
+<p class=text>
+After depth reconstruction, the depth map is plotted with color information from the RGB image using Mathematica’s graphics language.
+</p>
+
+<h6><font size="3" face="Calibri">Final Poster</font></h6>
+<img width=800 height=750 src="pstr.png"  alt="Poster"/>
+
+<hr>
+
+<h5><font size="5" face="Calibri">Tracking and Structure from Motion</font></h5>
+
+<h6><font size="3" face="Calibri">Harris Detector</font></h6>
+<img  width=300 height=280 src="vis_harris.png"  alt="Poster"/>
+
+<h6><font size="3" face="Calibri">Kanade-Lucas-Tomasi Tracking Procedure</font></h6>
+<img  width=300 height=280 src="vis_tomasi.png"  alt="Poster"/>
+<img  width=300 height=280 src="vis_tomasi2.png"  alt="Poster"/>
+
+<p class=text>
+Pseudocode:<br>
+<ol><li>Go through all the images<br><li>Calculate dx dy of the image<br><li>Go through all the keypoints for that image<br><li>Create a 15x15 window around the keypoint <br><li>Interpolate (linearly) between the window in first image to second image<br><li>Get the dx and dy for the window<br><li>Calculate It by subtracting the I(x,y,t) from I(x,y,t+1)<br><li>Calculate the second moment matrix M for I(x,y,t)<br><li>Invert this M and subtract from it matrix K, where K is [sum of (Ix*It); sum of(Iy*It)] and the summation is over the window<br><li>This gives us [u,v], add this to (xi, yi) to obtain (xi+1,yi+1)<br>
+</ol>
+</p>
+
+<hr>
+
+<h5><font size="5" face="Calibri">Lowe-style object instance recognition</font></h5>
+
+<img width=300 height=280 src="vis_lowe1.png" align=left alt="Intensity" />
+<img width=300 height=280 src="vis_lowe2.png" align=right alt="Segmentation"/>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<img width=300 height=280 src="vis_lowe3.png" align=left alt="Intensity" />
+<img width=300 height=280 src="vis_lowe4.png" align=right alt="Segmentation"/>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<img width=300 height=280 src="vis_lowe5.png" align=left alt="Intensity" />
+<img width=300 height=280 src="vis_lowe6.png" align=right alt="Segmentation"/>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<img width=300 height=280 src="vis_lowe7.png" align=left alt="Intensity" />
+<img width=300 height=280 src="vis_lowe8.png" align=right alt="Segmentation"/>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+

@@ -1,0 +1,143 @@
+<LINK REL=STYLESHEET TYPE="text/css" media=all HREF="./stylesheet.css">
+
+
+<html>
+<head>
+
+<title>Probabilistic Robotics</title>
+
+</head>
+
+
+
+<h2><font size="14" face="Calibri">Probabilistic Robotics</font></h2>
+
+<hr>
+<h6><font size="5" face="Calibri">Online Learning Algorithms</font></h6>
+<p class=text>
+The goal here is to apply learning algorithms online, to classify ladar points into one of five categories: ground (supporting surface), vegetation, facade, pole, and wire.
+</p>
+
+<h6><font size="4" face="Calibri">Multiclass Support Vector Machines</font></h6>
+<p class=text>
+The loss function of a multiclass SVM can be defined as:
+</p>
+<img width=280 height=60 src="online_1.png" alt="Segmentation"/><br>
+<p class=text>
+Here the Hingle Loss for the multiclass case is defined as:
+</p>
+<img width=320 height=40 src="online_2.png" alt="Segmentation"/>
+<p class=text>From the above Hinge Loss function we select the prediction p = argmax[wi^T x]
+</p><br>
+<p class=text>
+Overall the accuracy of using this algorithm was between 92-95% depending on the dataset. This could be boosted up by selecting parameters using corss-validation.
+</p>
+
+
+<img width=900 height=280 src="msvm1.png"  alt="Intensity" />
+<img width=900 height=400 src="msvm2.png"  alt="Segmentation"/>
+
+
+<h6><font size="4" face="Calibri">NORMA: Kernelized SVM</font></h6>
+<p class=text>
+Support Vector machine is a common classifier in the linear space. Here we implement an online version of SVM incorporating the  Radial Basis kernel function:
+</p>
+<img width=190 height=40 src="online_3.png" alt="Segmentation"/>
+<p class=text>
+ The general Loss function is the same as described previously. The kernel function substitutes the linear decision boundary. For our implementation we use the 'sliding window' mechanism. Therefore we were storing no more than 2000 Support Vectors for each class
+ </p><br>
+<p class=text>
+The kernel function helps perform much better yielding >97% accuracy. This is intuitive since the separation boundary does not need to be linear any more. However the kernelized version of SVM is computationally more intense.
+</p>
+<img width=900 height=280 src="ksvm2.png"  alt="Intensity" />
+<img width=900 height=400 src="ksvm1.png"  alt="Segmentation"/>
+
+ 
+ 
+<hr>
+
+<h6><font size="5" face="Calibri">Particle Filter</font></h6>
+
+<p class=text>
+The goal here is to localize a robot lost in Wean hall through the laser dataset and odometry readings from the robot. The particle filter has been developed in C++ and we incorporate OpenCV for the frontend. A probabilistic occupancy map of Wean Hall has been provided to us along with the log data from the robot. Since we have zero initial estimate of ground truth we start our model by randomly picking 10000 particles all over the map. A particle filter incorporates the following 3 steps:
+<br><br>
+1) Motion Model: Implements the motion of particles based on the odometry readings and a gaussian noise model.<br>
+2) Sensor Model: Checks the accuracy of each particle to justify their existence. This is done by attaching a weight to each particle based on its laser readings (zk) and the readings it should have measured (zk∗) according to the map. Weights are assigned through a probabilistic obervation model.<br>
+3) Resampling: Throws out low weighted particles and duplicates the good ones. Various schemes exist, we chose Low-Variance Resampling.
+
+</p>
+<h6><font size="3" face="Calibri">Log # 1</font></h6>
+
+<iframe width="560" height="315" src="http://www.youtube.com/embed/NzDv8jZdTxE" frameborder="0" allowfullscreen></iframe>
+
+<br>
+<h6><font size="3" face="Calibri">Log # 2</font></h6>
+
+<iframe width="560" height="315" src="http://www.youtube.com/embed/1QWprRW42nE" frameborder="0" allowfullscreen></iframe>
+
+<br>
+
+
+
+<hr>
+
+<h6><font size="5" face="Calibri">Mapping</font></h6>
+<h6><font size="3" face="Calibri">Theoretical Background</font></h6>
+<p class=text>
+The key element in any mapping problem is to calculate the posterior over maps given some control inputs (x) and sensor measurements(z). We find evidence grid as the most convenient method for mapping in 3 Dimensions on large amounts of data. An evidence grid is a uniform discretization of space into cells, where each cell value represents the degree of belief that the cell is occupied. In our case each cell is a cubic block or voxel. Therefore we breakdown the problem of estimating the map into a collection of seperate problems. One drawback of this representation is that it fails to encode dependencies between neighboring cells.
+</p>
+<img width=220 height=40 src="mapping_1.png" alt="Segmentation"/>
+<p class=text>
+Sensor measurements can then be integrated using the technique introduced by Moravec and Elfes
+</p>
+<img width=400 height=60 src="mapping_2.png" alt="Segmentation"/>
+<p class=text>
+This estimation can be converted to the logOdds form, making it numerically easier and update faster. Here we take the common assumption of a uniform prior(P (n) = 0.5).
+</p>
+<img width=290 height=40 src="mapping_3.png" alt="Segmentation"/>
+<p class=text>
+Lastly, in order to overcome any overconfidence in the map, Yguel et al. proposed a clamping
+</p>
+<img width=450 height=40 src="mapping_4.png" alt="Segmentation"/>
+<br>
+
+<h6><font size="3" face="Calibri">Implementation</font></h6>
+
+<img width=450 height=280 src="map1.jpg" align=left alt="Intensity" />
+<img width=450 height=280 src="map2.jpg" align=right alt="Segmentation"/>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br>
+
+Note: The video has some bad camera work<br><br><br>
+
+<iframe width="420" height="315" src="http://www.youtube.com/embed/wNoBmc_DWT0" frameborder="0" allowfullscreen></iframe>
+
+
+<hr>
+
+<h6><font size="5" face="Calibri">Particle Filter for 3-Dimensions</font></h6>
+
+<p class=text>
+The basis of this implementation is similar to the one described previosuly. However, this localization model was implemented on a 3-Dimensional environment. The PF ran in 4 dimensions ie x, y, z and yaw. We ignored the roll and pitch axes since the deviations in odometry was comparatively smaller. Yet the computational complexity of the algorithm was enormous.
+</p>
+
+
+<img width=300 height=280 src="b1.jpg" align=left alt="Intensity" />
+<img width=300 height=280 src="b2.jpg" align=right alt="Segmentation"/>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br>
+
+<p class=text>
+One floating particle to test the observation model:
+</p>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/5dlsNKZhCDU" frameborder="0" allowfullscreen></iframe>
+
+<p class=text>
+Fully functional particle filter. Very slow to converge:
+</p>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/LRaSe3TOTjc" frameborder="0" allowfullscreen></iframe>
+
+
+<hr>
