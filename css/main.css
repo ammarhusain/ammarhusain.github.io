@@ -1,0 +1,79 @@
+.thumbnail img {
+    max-width: 120px;
+    max-height: 100px;
+}
+
+p {
+    margin-top: 0;
+}
+
+body {
+    font-family: "europa", sans-serif;
+    font-weight: lighter;
+}
+
+#center {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#entries td {
+    padding-bottom: 20px;
+}
+
+#entries td.thumbnail {
+    left: 10px;
+    width: 120px;
+    vertical-align: top;
+    text-align: center;
+}
+
+#entries td.text {
+    padding-left: 20px;
+    min-height: 100px;
+    vertical-align: top;
+}
+
+/* Override blaskan */
+#header {
+    height: 50px;
+}
+
+.title {
+    color: #333;
+    font-size: 30px;
+    height: 40px;
+    font-weight: lighter;
+    position: relative;
+    float: left;
+    width: 49%;
+    padding: 0px;
+    margin: 0px;
+}
+
+.menu {
+    top: 6px;
+    height: 40px;
+    position: relative;
+    text-align: right;
+    float: left;
+    width: 48%;
+}
+
+.link-logo {
+    height: 25px;
+}
+
+#header .menu-item {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 14px;
+}
+
+#content {
+    clear: both;
+}
+
+.hidden {
+    display: none !important;
+}
